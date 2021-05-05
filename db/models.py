@@ -9,24 +9,23 @@ from sqlalchemy.sql import func
 from settings import POSTGRES_URL
 
 Base = declarative_base()
-engine = create_engine(POSTGRES_URL)
+engine = create_engine(POSTGRES_URL, echo=True)
 
 
 VideoTag = Table('video_tag', Base.metadata,
                  Column('video_id', Integer, ForeignKey('video.id'), primary_key=True),
-                 Column('tag_id', Integer, ForeignKey('tag.id'), primary_key=True, index=True))
+                 Column('tag_id', Integer, ForeignKey('tag.id'), primary_key=True))
 
 
 VideoSong = Table('video_song', Base.metadata,
                   Column('video_id', Integer, ForeignKey('video.id'), primary_key=True),
-                  Column('song_id', Integer, ForeignKey('song.id'), primary_key=True, index=True))
+                  Column('song_id', Integer, ForeignKey('song.id'), primary_key=True))
 
 
 class Author(Base):
     __tablename__ = 'author'
 
-    id = Column(Integer, primary_key=True)
-    unique_id = Column(String)
+    unique_id = Column(String, primary_key=True)
     nickname = Column(String)
     signature = Column(String)
     avatar_image = Column(String)
@@ -43,7 +42,7 @@ class Author(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    videos = relationship('Video', backref=backref('author'), lazy='dynamic')
+    videos = relationship('Video', backref=backref('author'))
 
     def __repr__(self):
         return f"<Author({self.id, self.unique_id})>"
@@ -53,7 +52,7 @@ class Video(Base):
     __tablename__ = 'video'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(ForeignKey('author.id'))
+    author_id = Column(ForeignKey('author.unique_id'))
     view_count = Column(Integer)
     heart_count = Column(Integer)
     comment_count = Column(Integer)
@@ -73,9 +72,9 @@ class Video(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    tags = relationship('Tag', secondary=VideoTag, backref=backref('video', lazy='dynamic'), lazy='dynamic')
-    songs = relationship('Song', secondary=VideoSong, backref=backref('video', lazy='dynamic'), lazy='dynamic')
-    parent_comments = relationship('ParentComment', backref=backref('video'), lazy='dynamic')
+    tags = relationship('Tag', secondary=VideoTag, backref=backref('video'))
+    songs = relationship('Song', secondary=VideoSong, backref=backref('video'))
+    parent_comments = relationship('ParentComment', backref=backref('video'))
 
     def __repr__(self):
         return f"<Video({self.id, self.created_at})>"
@@ -130,7 +129,7 @@ class ParentComment(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    child_comments = relationship('ChildComment', backref=backref('parent_comment'), lazy='dynamic')
+    child_comments = relationship('ChildComment', backref=backref('parent_comment'))
 
     def __repr__(self):
         return f"<ParentComment({self.id, self.video_id})>"

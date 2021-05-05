@@ -11,8 +11,7 @@ Session = sessionmaker(bind=engine)
 def create_author(author_data: dict):
     db_session = Session()
     try:
-        author = Author(id=author_data['id'],
-                        unique_id=author_data['unique_id'],
+        author = Author(unique_id=author_data['unique_id'],
                         nickname=author_data['nickname'],
                         signature=author_data['signature'],
                         avatar_image=author_data['avatar_image'],
@@ -32,10 +31,10 @@ def create_author(author_data: dict):
         raise e
 
 
-def create_video(video_data: dict, db_session):
+def create_video(video_data: dict):
+    db_session = Session()
     try:
-        video = Video(id=video_data['id'],
-                      user_id=video_data['user_id'],
+        video = Video(author_id=video_data['author_id'],
                       view_count=video_data['view_count'],
                       heart_count=video_data['heart_count'],
                       comment_count=video_data['comment_count'],
@@ -81,10 +80,10 @@ def create_song(song_data: dict):
                     author_name=song_data['author_name'],
                     album=song_data['album'],
                     song_image=song_data['song_image'],
-                    song_link=song_data['song_image'],
-                    duration=song_data['song_image'],
-                    video_count=song_data['song_image'],
-                    is_original=song_data['song_image'])
+                    song_link=song_data['song_link'],
+                    duration=song_data['duration'],
+                    video_count=song_data['video_count'],
+                    is_original=song_data['is_original'])
         db_session.add(song)
         db_session.commit()
     except Exception as e:
