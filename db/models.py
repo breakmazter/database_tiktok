@@ -17,15 +17,12 @@ VideoTag = Table('video_tag', Base.metadata,
                  Column('tag_id', Integer, ForeignKey('tag.id'), primary_key=True))
 
 
-VideoSong = Table('video_song', Base.metadata,
-                  Column('video_id', Integer, ForeignKey('video.id'), primary_key=True),
-                  Column('song_id', Integer, ForeignKey('song.id'), primary_key=True))
-
-
 class Author(Base):
     __tablename__ = 'author'
 
-    unique_id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True)
+
+    unique_id = Column(String)
     nickname = Column(String)
     signature = Column(String)
     avatar_image = Column(String)
@@ -45,14 +42,17 @@ class Author(Base):
     videos = relationship('Video', backref=backref('author'))
 
     def __repr__(self):
-        return f"<Author({self.id, self.unique_id})>"
+        return f"<Author([{self.id}], [{self.unique_id}])>"
 
 
 class Video(Base):
     __tablename__ = 'video'
 
     id = Column(Integer, primary_key=True)
-    author_id = Column(ForeignKey('author.unique_id'))
+
+    author_id = Column(ForeignKey('author.id'))
+    song_id = Column(ForeignKey('song.id'))
+
     view_count = Column(Integer)
     heart_count = Column(Integer)
     comment_count = Column(Integer)
@@ -73,17 +73,17 @@ class Video(Base):
     modified_at = Column(DateTime, onupdate=func.now())
 
     tags = relationship('Tag', secondary=VideoTag, backref=backref('video'))
-    songs = relationship('Song', secondary=VideoSong, backref=backref('video'))
     parent_comments = relationship('ParentComment', backref=backref('video'))
 
     def __repr__(self):
-        return f"<Video({self.id, self.created_at})>"
+        return f"<Video([{self.id}], [{self.author_id}], [{self.description}])>"
 
 
 class Tag(Base):
     __tablename__ = 'tag'
 
     id = Column(Integer, primary_key=True)
+
     name_tag = Column(String)
     description = Column(String)
     view_count = Column(Integer)
@@ -93,13 +93,14 @@ class Tag(Base):
     modified_at = Column(DateTime, onupdate=func.now())
 
     def __repr__(self):
-        return f"<Tag({self.id, self.name_tag})>"
+        return f"<Tag([{self.id}], [{self.name_tag}])>"
 
 
 class Song(Base):
     __tablename__ = 'song'
 
     id = Column(Integer, primary_key=True)
+
     title = Column(String)
     author_name = Column(String)
     album = Column(String)
@@ -112,15 +113,19 @@ class Song(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
+    videos = relationship('Video', backref=backref('song'))
+
     def __repr__(self):
-        return f"<Song({self.id, self.title})>"
+        return f"<Song([{self.id}], [{self.title}])>"
 
 
 class ParentComment(Base):
     __tablename__ = 'parent_comment'
 
     id = Column(Integer, primary_key=True)
+
     video_id = Column(Integer, ForeignKey('video.id'))
+
     comment_text = Column(String)
     heart_count = Column(Integer)
     is_child_comments = Column(Boolean)
@@ -132,14 +137,16 @@ class ParentComment(Base):
     child_comments = relationship('ChildComment', backref=backref('parent_comment'))
 
     def __repr__(self):
-        return f"<ParentComment({self.id, self.video_id})>"
+        return f"<ParentComment([{self.id}], [{self.video_id}])>"
 
 
 class ChildComment(Base):
     __tablename__ = 'child_comment'
 
     id = Column(Integer, primary_key=True)
+
     parent_id = Column(Integer, ForeignKey('parent_comment.id'))
+
     comment_text = Column(String)
     heart_count = Column(Integer)
 
@@ -147,7 +154,7 @@ class ChildComment(Base):
     modified_at = Column(DateTime, onupdate=func.now())
 
     def __repr__(self):
-        return f"<ChildComment({self.id, self.parent_id})>"
+        return f"<ChildComment([{self.id}], [{self.parent_id}])>"
 
 
 if __name__ == "__main__":

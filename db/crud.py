@@ -35,6 +35,7 @@ def create_video(video_data: dict):
     db_session = Session()
     try:
         video = Video(author_id=video_data['author_id'],
+                      song_id=video_data['author_id'],
                       view_count=video_data['view_count'],
                       heart_count=video_data['heart_count'],
                       comment_count=video_data['comment_count'],
