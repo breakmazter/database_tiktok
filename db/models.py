@@ -73,8 +73,6 @@ class Video(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    authors = relationship('Author', )
-
     tags = relationship('Tag', secondary=VideoTag, backref=backref('video', lazy='dynamic'), lazy='dynamic')
     songs = relationship('Song', secondary=VideoSong, backref=backref('video', lazy='dynamic'), lazy='dynamic')
     parent_comments = relationship('ParentComment', backref=backref('video'), lazy='dynamic')
