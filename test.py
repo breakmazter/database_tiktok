@@ -1,14 +1,10 @@
 from TikTokApi import TikTokApi
+from pprint import pprint
+
+print = pprint
 
 api = TikTokApi()
 
-results = 10
+user = api.get_user(username="kom_sportswear")
 
-trending = api.get_user(username="kom_sportswear")
-
-for tiktok in trending:
-    print(tiktok)
-
-
-
-
+print(user)
