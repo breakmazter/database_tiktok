@@ -39,7 +39,7 @@ class Author(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    videos = relationship('Video', backref=backref('author'))
+    videos = relationship('Video', back_populates='author')
 
     def __repr__(self):
         return f"<Author([{self.id}], [{self.unique_id}])>"
@@ -72,8 +72,11 @@ class Video(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    tags = relationship('Tag', secondary=VideoTag, backref=backref('video'))
-    parent_comments = relationship('ParentComment', backref=backref('video'))
+    author = relationship('Author', back_populates='videos')
+
+    tags = relationship('Tag', secondary=VideoTag, back_populates='videos')
+    parent_comments = relationship('ParentComment', back_populates='video')
+    song = relationship('Song', back_populates='videos')
 
     def __repr__(self):
         return f"<Video([{self.id}], [{self.author_id}], [{self.description}])>"
@@ -91,6 +94,8 @@ class Tag(Base):
 
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
+
+    videos = relationship('Video', secondary=VideoTag, back_populates='tags')
 
     def __repr__(self):
         return f"<Tag([{self.id}], [{self.name_tag}])>"
@@ -113,7 +118,7 @@ class Song(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    videos = relationship('Video', backref=backref('song'))
+    videos = relationship('Video', back_populates='song')
 
     def __repr__(self):
         return f"<Song([{self.id}], [{self.title}])>"
@@ -134,7 +139,8 @@ class ParentComment(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
-    child_comments = relationship('ChildComment', backref=backref('parent_comment'))
+    video = relationship('Video', back_populates='parent_comments')
+    child_comments = relationship('ChildComment', back_populates='parent_comment')
 
     def __repr__(self):
         return f"<ParentComment([{self.id}], [{self.video_id}])>"
@@ -152,6 +158,8 @@ class ChildComment(Base):
 
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
+
+    parent_comment = relationship('ParentComment', back_populates='child_comments')
 
     def __repr__(self):
         return f"<ChildComment([{self.id}], [{self.parent_id}])>"
