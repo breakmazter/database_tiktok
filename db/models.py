@@ -1,4 +1,4 @@
-__all__ = ('Author', 'Video', 'Tag', 'Song', 'ParentComment', 'ChildComment')
+__all__ = ('Author', 'Video', 'Tag', 'Song', 'ParentComment', 'ChildComment', 'VideoTag')
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, create_engine
@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import func
 
-from settings import POSTGRES_URL
+from settings import *
 
 Base = declarative_base()
 engine = create_engine(POSTGRES_URL, echo=True)
@@ -40,6 +40,8 @@ class Author(Base):
     modified_at = Column(DateTime, onupdate=func.now())
 
     videos = relationship('Video', back_populates='author')
+    parent_comments = relationship('ParentComment', back_populates='author')
+    child_comments = relationship('ChildComment', back_populates='author')
 
     def __repr__(self):
         return f"<Author([{self.id}], [{self.unique_id}])>"
@@ -73,7 +75,6 @@ class Video(Base):
     modified_at = Column(DateTime, onupdate=func.now())
 
     author = relationship('Author', back_populates='videos')
-
     tags = relationship('Tag', secondary=VideoTag, back_populates='videos')
     parent_comments = relationship('ParentComment', back_populates='video')
     song = relationship('Song', back_populates='videos')
@@ -129,6 +130,7 @@ class ParentComment(Base):
 
     id = Column(Integer, primary_key=True)
 
+    author_id = Column(Integer, ForeignKey('author.id'))
     video_id = Column(Integer, ForeignKey('video.id'))
 
     comment_text = Column(String)
@@ -141,6 +143,7 @@ class ParentComment(Base):
 
     video = relationship('Video', back_populates='parent_comments')
     child_comments = relationship('ChildComment', back_populates='parent_comment')
+    author = relationship('Author', back_populates='parent_comments')
 
     def __repr__(self):
         return f"<ParentComment([{self.id}], [{self.video_id}])>"
@@ -151,6 +154,7 @@ class ChildComment(Base):
 
     id = Column(Integer, primary_key=True)
 
+    author_id = Column(Integer, ForeignKey('author.id'))
     parent_id = Column(Integer, ForeignKey('parent_comment.id'))
 
     comment_text = Column(String)
@@ -159,6 +163,7 @@ class ChildComment(Base):
     created_at = Column(DateTime, server_default=func.now())
     modified_at = Column(DateTime, onupdate=func.now())
 
+    author = relationship('Author', back_populates='child_comments')
     parent_comment = relationship('ParentComment', back_populates='child_comments')
 
     def __repr__(self):

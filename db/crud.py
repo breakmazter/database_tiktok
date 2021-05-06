@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Author, Video, Tag, Song, ParentComment, ChildComment
+from db.models import *
 
 from settings import *
 
@@ -35,7 +35,7 @@ def create_video(video_data: dict):
     db_session = Session()
     try:
         video = Video(author_id=video_data['author_id'],
-                      song_id=video_data['author_id'],
+                      song_id=video_data['song_id'],
                       view_count=video_data['view_count'],
                       heart_count=video_data['heart_count'],
                       comment_count=video_data['comment_count'],
@@ -61,8 +61,7 @@ def create_video(video_data: dict):
 def create_tag(tag_data: dict):
     db_session = Session()
     try:
-        tag = Tag(id=tag_data['id'],
-                  name_tag=tag_data['name_tag'],
+        tag = Tag(name_tag=tag_data['name_tag'],
                   description=tag_data['description'],
                   view_count=tag_data['view_count'],
                   is_commerce=tag_data['is_commerce'])
@@ -76,8 +75,7 @@ def create_tag(tag_data: dict):
 def create_song(song_data: dict):
     db_session = Session()
     try:
-        song = Song(id=song_data['id'],
-                    title=song_data['title'],
+        song = Song(title=song_data['title'],
                     author_name=song_data['author_name'],
                     album=song_data['album'],
                     song_image=song_data['song_image'],
@@ -95,7 +93,7 @@ def create_song(song_data: dict):
 def create_parent_comment(parent_comment_data: dict):
     db_session = Session()
     try:
-        parent_comment = ParentComment(id=parent_comment_data['id'],
+        parent_comment = ParentComment(author_id=parent_comment_data['author_id'],
                                        video_id=parent_comment_data['video_id'],
                                        comment_text=parent_comment_data['comment_text'],
                                        heart_count=parent_comment_data['heart_count'],
@@ -111,7 +109,7 @@ def create_parent_comment(parent_comment_data: dict):
 def create_child_comment(child_comment_data: dict):
     db_session = Session()
     try:
-        child_comment = ChildComment(id=child_comment_data['id'],
+        child_comment = ChildComment(author_id=child_comment_data['author_id'],
                                      parent_id=child_comment_data['parent_id'],
                                      comment_text=child_comment_data['comment_text'],
                                      heart_count=child_comment_data['heart_count'])
