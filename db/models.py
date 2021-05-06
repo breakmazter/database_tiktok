@@ -2,7 +2,7 @@ __all__ = ('Author', 'Video', 'Tag', 'Song', 'ParentComment', 'ChildComment')
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, create_engine
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import func
 
