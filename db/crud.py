@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, insert
 from sqlalchemy.orm import sessionmaker
 from db.models import *
 
@@ -8,10 +8,10 @@ engine = create_engine(POSTGRES_URL, echo=True)
 Session = sessionmaker(bind=engine)
 
 
-def create_author(author_data: dict):
-    db_session = Session()
+def create_author(author_data: dict, db_session):
     try:
-        author = Author(unique_id=author_data['unique_id'],
+        author = Author(id=author_data['id'],
+                        unique_id=author_data['unique_id'],
                         nickname=author_data['nickname'],
                         signature=author_data['signature'],
                         avatar_image=author_data['avatar_image'],
@@ -25,16 +25,16 @@ def create_author(author_data: dict):
                         is_private=author_data['is_private'],
                         is_commerce=author_data['is_commerce'])
         db_session.add(author)
-        db_session.commit()
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
 
 
-def create_video(video_data: dict):
-    db_session = Session()
+def create_video(video_data: dict, db_session):
     try:
-        video = Video(author_id=video_data['author_id'],
+        video = Video(id=video_data['id'],
+                      author_id=video_data['author_id'],
                       song_id=video_data['song_id'],
                       view_count=video_data['view_count'],
                       heart_count=video_data['heart_count'],
@@ -52,30 +52,30 @@ def create_video(video_data: dict):
                       is_ad=video_data['is_ad'],
                       is_stitch_enabled=video_data['is_stitch_enabled'])
         db_session.add(video)
-        db_session.commit()
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
 
 
-def create_tag(tag_data: dict):
-    db_session = Session()
+def create_tag(tag_data: dict, db_session):
     try:
-        tag = Tag(name_tag=tag_data['name_tag'],
+        tag = Tag(id=tag_data['id'],
+                  name_tag=tag_data['name_tag'],
                   description=tag_data['description'],
                   view_count=tag_data['view_count'],
                   is_commerce=tag_data['is_commerce'])
         db_session.add(tag)
-        db_session.commit()
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
 
 
-def create_song(song_data: dict):
-    db_session = Session()
+def create_song(song_data: dict, db_session):
     try:
-        song = Song(title=song_data['title'],
+        song = Song(id=song_data['id'],
+                    title=song_data['title'],
                     author_name=song_data['author_name'],
                     album=song_data['album'],
                     song_image=song_data['song_image'],
@@ -84,37 +84,47 @@ def create_song(song_data: dict):
                     video_count=song_data['video_count'],
                     is_original=song_data['is_original'])
         db_session.add(song)
-        db_session.commit()
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
 
 
-def create_parent_comment(parent_comment_data: dict):
-    db_session = Session()
+def create_parent_comment(parent_comment_data: dict, db_session):
     try:
-        parent_comment = ParentComment(author_id=parent_comment_data['author_id'],
+        parent_comment = ParentComment(id=parent_comment_data['id'],
+                                       author_id=parent_comment_data['author_id'],
                                        video_id=parent_comment_data['video_id'],
                                        comment_text=parent_comment_data['comment_text'],
                                        heart_count=parent_comment_data['heart_count'],
                                        is_child_comments=parent_comment_data['is_child_comments'],
                                        child_comment_count=parent_comment_data['child_comment_count'])
         db_session.add(parent_comment)
-        db_session.commit()
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
 
 
-def create_child_comment(child_comment_data: dict):
-    db_session = Session()
+def create_child_comment(child_comment_data: dict, db_session):
     try:
-        child_comment = ChildComment(author_id=child_comment_data['author_id'],
+        child_comment = ChildComment(id=child_comment_data['id'],
+                                     author_id=child_comment_data['author_id'],
                                      parent_id=child_comment_data['parent_id'],
                                      comment_text=child_comment_data['comment_text'],
                                      heart_count=child_comment_data['heart_count'])
         db_session.add(child_comment)
-        db_session.commit()
+        db_session.flush()
+    except Exception as e:
+        db_session.rollback()
+        raise e
+
+
+def create_video_tag(video_id, tag_id, db_session):
+    try:
+        dt = insert(VideoTag).values(video_id=video_id, tag_id=tag_id)
+        db_session.execute(dt)
+        db_session.flush()
     except Exception as e:
         db_session.rollback()
         raise e
