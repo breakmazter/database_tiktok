@@ -1,11 +1,5 @@
-from sqlalchemy import create_engine, insert
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import insert
 from db.models import *
-
-from settings import *
-
-engine = create_engine(POSTGRES_URL, echo=True)
-Session = sessionmaker(bind=engine)
 
 
 def create_author(author_data: dict, db_session):
