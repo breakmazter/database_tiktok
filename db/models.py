@@ -22,6 +22,7 @@ class Author(Base):
 
     id = Column(Integer, primary_key=True)
 
+    # you mean tik tok id? it's better to rename. id is not unique)?
     unique_id = Column(String)
     nickname = Column(String)
     signature = Column(String)
